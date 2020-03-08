@@ -25,6 +25,9 @@ app.get('/', (req, res) => {
     });
 });
 
+app.routes = require('./app/routes/task.routes')(app);
+
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {

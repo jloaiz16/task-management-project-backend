@@ -66,10 +66,33 @@ exports.update = (req, res) => {
         res.status(500).send({
             message: 'Error updating Task with id: ' + taskId
         });
-    };
+    });
 }
 
-exports.delete = (req, res) => { };
+// Delete a task by id
+exports.delete = (req, res) => {
+    const taskId = re.params.id;
+
+    Task.destroy({
+        where: { id: taskId }
+    })
+        .then(res => {
+            if (res == 1) {
+                res.send({
+                    message: 'Task was deleted successfully!'
+                });
+            } else {
+                res.send({
+                    message: `Cannot delete Task with id: ${id}`
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: 'Could not delete Task with id: ' + taskId
+            });
+        });
+};
 
 // Get specific task by id
 exports.getOne = (req, res) => {
@@ -81,11 +104,39 @@ exports.getOne = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error finding Task with id: " + taskId
+                message: 'Error finding Task with id: ' + taskId
             });
         });
 };
 
-exports.deleteAll = (req, res) => { };
+// Delete all task
+exports.deleteAll = (req, res) => {
+    Task.destroy({
+        where: {},
+        truncate: false
+    })
+        .then(resp => {
+            res.send({ message: `${resp} Tasks were deleted successfully!` });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || 'Some error occurred while removing all tasks.'
+            });
+        });
+};
 
-exports.getAllDone = (req, res) => { };
+// List all tasks that are in done
+exports.getAllDone = (req, res) => {
+    Task.findAll({
+        where: {
+            done: true
+        }
+    }).then(data => {
+        res.send(data);
+    }).catch(err => {
+        res.status(500).send({
+            message: err.message || 'Something when wrong finding done tasks'
+        });
+    });
+};
